@@ -1,0 +1,107 @@
+Mappings:
+  RegionMap: 
+    eu-west-1:
+      "AMI": "ami-06e0ce9d3339cb039"
+
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'true'
+      Tags:
+        - Key: Name
+          Value: vpc-benoit
+  
+  publicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: eu-west-1a
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: public_subnet_benoit
+  
+  privateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: eu-west-1a
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: private_subnet_benoit
+  
+  publicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+      Tags:
+        - Key: Name
+          Value: public_route_table_benoit
+  
+  privateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+      Tags:
+        - Key: Name
+          Value: private_route_table_benoit
+  
+  igwBenoitM2I:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: gateway_benoit_m2i
+  
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref myVPC
+      InternetGatewayId: !Ref igwBenoitM2I
+  
+  defaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref publicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref igwBenoitM2I
+  
+  routeTableAssocName:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref publicSubnet
+      RouteTableId: !Ref publicRouteTable
+  
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      InstanceType: t2.micro
+      AvailabilityZone: eu-west-1a
+      SubnetId: !Ref publicSubnet
+      SecurityGroupIds:
+        - !Ref WebServerSecGroup
+      Tags:
+        - Key: Name
+          Value: benoit-instance-vpc-m2i-formation
+  
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: gs-benoit-web
+      GroupDescription: groupe de securite web
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: gs-benoit-vpc

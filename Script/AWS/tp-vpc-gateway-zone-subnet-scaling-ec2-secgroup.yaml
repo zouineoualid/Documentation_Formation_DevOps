@@ -1,0 +1,228 @@
+#Mappings des ressources EC2 des régions d'Irlande et de Stockholm
+
+#Irlande -> t2.micro | Stockholm -> t3.micro
+
+Mappings:
+  RegionMap: 
+    eu-west-1:
+      "AMI": "ami-06e0ce9d3339cb039"
+
+#Définition des ressources + VPC
+
+Resources:
+  TPVPCBenoit:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'true'
+      Tags:
+        - Key: Name
+          Value: tp-vpc-benoit
+  
+  #Définition des subnets : le 1er en Irlande, le second à Stockholm
+
+  publicSubnetIreland1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: eu-west-1a
+      VpcId: !Ref TPVPCBenoit
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: public_subnet_TP_benoit_Irlande_A
+
+  publicSubnetIreland2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: eu-west-1b
+      VpcId: !Ref TPVPCBenoit
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: public_subnet_TP_benoit_Irlande_B
+
+  #Création de la table de routage 
+  #Une seule table de routage pour les deux subnet car deux subnet publique
+
+  publicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref TPVPCBenoit
+      Tags:
+        - Key: Name
+          Value: public_route_table_benoit
+
+  #Création Gateway
+
+  igwBenoitTPM2I:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: gateway_benoit_TP_m2i
+
+  #Relier la Gateway au VPC
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref TPVPCBenoit
+      InternetGatewayId: !Ref igwBenoitTPM2I
+
+  #Création de la route publique
+
+  defaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref publicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref igwBenoitTPM2I
+
+  #Association de la route au subnet Irlande + Stockholm
+
+  routeTableAssocNameIreland1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref publicSubnetIreland1
+      RouteTableId: !Ref publicRouteTable
+
+  routeTableAssocNameIreland2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref publicSubnetIreland2
+      RouteTableId: !Ref publicRouteTable
+
+  #Création Template
+
+  LaunchTemplate:
+    Type: 'AWS::EC2::LaunchTemplate'
+    Properties:
+      LaunchTemplateName: ConfigurationTemplate
+      LaunchTemplateData:
+        NetworkInterfaces:
+          - DeviceIndex: 0
+            AssociatePublicIpAddress: true
+            Groups:
+              - !Ref WebServerSecGroup
+            DeleteOnTermination: true
+        Placement:
+          Tenancy: default
+        ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+        InstanceType: t2.micro
+        UserData:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash
+              yum update -y
+              yum install httpd -y
+              systemctl start httpd
+              systemctl enable httpd
+  
+  #Création Auto Scaling
+
+  asBenoitTPM2i:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      AvailabilityZones: 
+        - eu-west-1a
+        - eu-west-1b
+      MaxSize: 6
+      MinSize: 3
+      DesiredCapacity: '3'
+      VPCZoneIdentifier:
+        - !Ref publicSubnetIreland1
+        - !Ref publicSubnetIreland2
+      Tags:
+        - Key: Name
+          Value: Auto-Scaling-Benoit-TP
+          PropagateAtLaunch: 'True'
+
+  #Création EC2 Ireland
+
+  EC2InstanceIreland1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      InstanceType: t2.micro
+      AvailabilityZone: eu-west-1a
+      SubnetId: !Ref publicSubnetIreland1
+      SecurityGroupIds:
+        - !Ref WebServerSecGroup
+      Tags:
+        - Key: Name
+          Value: Instance-apache-Ireland-1
+      UserData:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash
+              yum update -y
+              yum install httpd -y
+              systemctl start httpd
+              systemctl enable httpd
+
+  EC2InstanceIreland2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      InstanceType: t2.micro
+      AvailabilityZone: eu-west-1a
+      SubnetId: !Ref publicSubnetIreland1
+      SecurityGroupIds:
+        - !Ref WebServerSecGroup
+      Tags:
+        - Key: Name
+          Value: Instance-apache-Ireland-2
+      UserData:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash
+              yum update -y
+              yum install httpd -y
+              systemctl start httpd
+              systemctl enable httpd
+
+  #Création EC2 Stockholm
+
+  EC2InstanceIreland3:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      InstanceType: t2.micro
+      AvailabilityZone: eu-west-1b
+      SubnetId: !Ref publicSubnetIreland2
+      SecurityGroupIds:
+        - !Ref WebServerSecGroup
+      Tags:
+        - Key: Name
+          Value: Instance-apache-Ireland-3
+      UserData:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash
+              yum update -y
+              yum install httpd -y
+              systemctl start httpd
+              systemctl enable httpd
+
+  #Création groupe de sécurité
+
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: gs-benoit-tp-web
+      GroupDescription: groupe de securite web - tp
+      VpcId: !Ref TPVPCBenoit
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: gs-benoit-tp

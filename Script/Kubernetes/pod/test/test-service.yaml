@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vote
+  labels:
+    name: vote
+spec:
+  containers:
+  - name: vote
+    image: alexwhen/docker-2048
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug
+  labels:
+    name: www
+spec:
+  containers:
+  - name: debug
+    image: debian
+    command:
+      - "sleep"
+      - "100000000"
+    

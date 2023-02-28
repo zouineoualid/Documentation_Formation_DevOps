@@ -1,0 +1,76 @@
+- hosts: 10.125.25.93
+  become: yes
+  tasks:
+    - name: Installation docker - Debian
+      pacman:
+        name: 
+          - docker
+          #- docker.io 
+          - docker-compose 
+        state: present
+    
+    - name: Installation git - Debian
+      pacman:
+        name: git
+        state: present
+
+
+- hosts: 10.125.25.94
+  become: yes
+  tasks:
+    - name: Installation docker - Arch
+      pacman:
+        name: 
+          - docker
+          #- docker.io
+          - docker-compose
+        state: present
+    
+    - name: Installation git - Arch
+      pacman:
+        name: git
+        state: present
+        
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: création répertoire temporaire vel
+      file:
+        path: /tmp/vel
+        state: directory
+        mode: 0777
+        #when: __fichier_vel.stat.exists
+
+    - name: git clone du depôt freezer
+      git:
+       repo: https://framagit.org/bkoj/freezer.git
+       dest: /tmp/vel
+       force: yes
+
+    - name: modification droit ficher
+      file:
+        path: /tmp/vel/init.sh
+        mode: 0777
+
+    #  - name: ajout clé ssh
+
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: cd dans le dossier vel + exécution du fichier init.sh
+    ansible.builtin.shell: cd /tmp/vel && bash init.sh
+  - name: Generate SSH Key
+    openssh_keypair: 
+      path: /tmp/jenkins_rsa
+      type: rsa
+      size: 4096
+      state : present
+    delegate_to: localhost
+  - name: Deploy SSH Key
+    authorized_key: 
+      user: jenkins
+      key: "{{ lookup('file', '/tmp/jenkins_rsa.pub') }}"
+      state: present
+      become: yes

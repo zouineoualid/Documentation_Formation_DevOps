@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: result
+  name: result
+spec:
+  # le type peut être nodePort avec l'adresse du node
+  type: LoadBalancer
+  ports:
+    - name: "result-service"
+      port: 80
+      targetPort: 80
+  selector:
+    app: result

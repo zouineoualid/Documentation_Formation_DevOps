@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appli-vote
+  labels:
+    name: appli-vote
+spec:
+  selector:
+    matchLabels:
+      app: appli-vote
+  template:
+    metadata:
+      labels:
+        app: appli-vote
+    spec:
+      containers:
+      - name: api-appli-vote
+        image: benoitm2iregistry.azurecr.io/appli-vote
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "200m"
+        ports:
+        - containerPort: 80

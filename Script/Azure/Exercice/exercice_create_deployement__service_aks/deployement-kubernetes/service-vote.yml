@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: appli-vote
+spec:
+  type: LoadBalancer
+  selector:
+    app: appli-vote
+  ports:
+  - port: 80
+    targetPort: 80

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    name: db
+spec:
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: appli-db
+        image: benoitm2iregistry.azurecr.io/appli-postgres
+        env: 
+        - name: "POSTGRES_USER"
+          value: "postgres"
+        - name: "POSTGRES_PASSWORD"
+          value: "postgres"
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "200m"
+        ports:
+        - containerPort: 5432

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appli-worker
+  labels:
+    name: appli-worker
+spec:
+  selector:
+    matchLabels:
+      app: appli-worker
+  template:
+    metadata:
+      labels:
+        app: appli-worker
+    spec:
+      containers:
+      - name: appli-worker
+        image: benoitm2iregistry.azurecr.io/appli-worker
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "200m"

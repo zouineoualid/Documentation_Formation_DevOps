@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appli-result
+  labels:
+    name: appli-result
+spec:
+  selector:
+    matchLabels:
+      app: appli-result
+  template:
+    metadata:
+      labels:
+        app: appli-result
+    spec:
+      containers:
+      - name: api-appli-result
+        image: benoitm2iregistry.azurecr.io/appli-result
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "200m"
+        ports:
+        - containerPort: 4000

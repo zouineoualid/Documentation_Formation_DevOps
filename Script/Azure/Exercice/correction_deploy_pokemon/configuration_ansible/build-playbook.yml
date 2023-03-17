@@ -1,0 +1,37 @@
+---
+- hosts: ihab
+  become: true
+  tasks:
+  - name: install git
+    apt:
+      name: git
+      update_cache: yes
+  # - name: copy script install docker
+  #   copy:
+  #     src: ./docker.sh
+  #     dest: ./docker.sh
+  - name: run install docker
+    shell:
+      cmd: chmod +x docker.sh && ./docker.sh 
+  - name: clone project 
+    git:
+      repo: https://github.com/utopios/pokemon-app.git
+      dest: /pokemon-app
+  - name: connect to azurecr
+    community.docker.docker_login:
+      registry_url: m2iformationihab.azurecr.io
+      username: m2iformationihab
+      password: lWR/fSq2rPeIHnnpiS5TCtrnkN+IWh9FaNDGHIhWd8+ACRBr9t+L
+  - name: Build an image and push
+    community.docker.docker_image:
+      build:
+        path: /pokemon-app/{{item}}
+      name: m2iformationihab.azurecr.io/{{item}}
+      source: build
+      push: true
+    with_items:
+      - dollop
+      - fastapp
+      - glimmer
+      - goapp
+    

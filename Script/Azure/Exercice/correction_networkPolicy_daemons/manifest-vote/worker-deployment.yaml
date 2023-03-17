@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+# kind: Deployment
+kind: DaemonSet
+metadata:
+  labels:
+    app: worker
+  name: worker
+spec:
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+        customer: redis
+        customer-db: db
+    spec:
+      containers:
+        - image: m2iformationihab.azurecr.io/worker-image
+          name: worker
+          imagePullPolicy: Always

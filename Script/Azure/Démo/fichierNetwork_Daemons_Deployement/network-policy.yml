@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: first-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: api-python-deployment
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: client-api-python
+      port:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            app: target-api-python
+      port:
+        - protocol: TCP
+          port: 8080

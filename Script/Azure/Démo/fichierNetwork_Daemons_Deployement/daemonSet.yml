@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: api-python-deployment
+  labels:
+    name: api-python-deployment
+spec:
+  selector:
+    matchLabels:
+      app: api-python-deployment
+  template:
+    metadata:
+      labels:
+        app: api-python-deployment
+    spec:
+      containers:
+      - name: api-python
+        image: m2iformationihab.azurecr.io/api-python
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 8080
+        #livenessProbe:
+        #readinessProbe:
+        startupProbe:
+          ## Une requête HTTP
+          # httpGet:
+          #   path: /check2
+          #   port: 8080
+          # initialDelaySeconds: 2
+          # periodSeconds: 3
+          ## Une commande shell ou bash
+          # exec:
+          #   command: 
+          #     - "cat app.py"
+
+          ## Vérification d'ouverture d'un TCP Socket
+          tcpSocket:
+            port: 8080

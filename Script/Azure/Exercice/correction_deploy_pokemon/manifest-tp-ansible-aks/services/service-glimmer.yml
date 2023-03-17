@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: spoon-glimmer-service
+  name: spoon-glimmer-service
+spec:
+  # le type peut être nodePort avec l'adresse du node
+  type: LoadBalancer
+  ports:
+    - name: "glimmer-service"
+      port: 80
+      targetPort: 80
+  selector:
+    app: spoon-glimmer

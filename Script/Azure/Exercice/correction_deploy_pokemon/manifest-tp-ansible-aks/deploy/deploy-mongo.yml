@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: spoon-mongo
+  name: spoon-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spoon-mongo
+  template:
+    metadata:
+      labels:
+        app: spoon-mongo
+        customer-db: db
+    spec:
+      containers:
+        - image: mongo
+          name: spoon-mongo
+
+
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 27017
+              name: spoon-mongo
+          # livenessProbe:
+          #   httpGet:
+          #     path: /check
+          #     port: 3000
+          #   initialDelaySeconds: 2
+          #   periodSeconds: 3

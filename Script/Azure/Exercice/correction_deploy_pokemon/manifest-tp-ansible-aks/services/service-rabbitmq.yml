@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: spoon-rabbitmq-service
+  name: spoon-rabbitmq-service
+spec:
+  # le type peut être nodePort avec l'adresse du node
+
+  ports:
+    - name: "rabbitmq-service"
+      port: 5672
+      targetPort: 5672
+  selector:
+    app: spoon-rabbitmq

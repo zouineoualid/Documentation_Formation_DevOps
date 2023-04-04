@@ -1,0 +1,16 @@
+#!/bin/bash
+
+reponse="oui"
+
+while [ $reponse != quit ]
+do 
+    read -p "Pouvez-vous indiquer la longueur du côté A ? : " a_longueur
+    read -p "Pouvez-vous indiquer la longueur du côté B ? : " b_longueur
+    read -p "Pouvez-vous indiquer la longueur de l'hypothénuse ? : " hypothenuse
+    if [[ (($hypothenuse**2 -eq $a_longueur**2+$b_longueur**2)) ]]; then 
+        echo "Le triangle est rectangle"
+    else 
+        echo "le triangle n'est pas rectangle"  
+fi
+read -p "Voulez vous à nouveau vérifier si le triangle est rectangle : " reponse
+done

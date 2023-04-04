@@ -1,0 +1,14 @@
+#!/bin/bash
+
+read -p "Combien d'adresse IP voulez-vous générer ? : " nb_address_ip
+
+#Génération addresse IP
+
+for compteur in $( seq 0 $nb_address_ip)
+do
+        printf "%d.%d.%d.%d\n" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" >> file_list_ip
+done
+
+
+
+

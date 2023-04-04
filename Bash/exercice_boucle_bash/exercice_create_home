@@ -1,0 +1,22 @@
+#!/bin/bash
+
+list_user=$(grep -E '10[0-9][0-9]' /etc/passwd | grep -v x:1000 | cut -d: -f1,3,6,7)
+
+IFS=$'\n'
+
+for user in $list_user
+do
+
+    name_user=$(echo $user|cut -d: -f1)
+    home_user=$(echo $user|cut -d: -f3)
+
+    read -p "Taper 1 si vous voulez créer un home directory : " choix
+
+    if [ $choix -eq 1 ]; then
+        if [ -d $son_home ]; then
+            mkdir $home_user
+        fi
+    fi
+
+done
+

@@ -1,0 +1,35 @@
+# #!/bin/bash
+
+# #Définition variable programme
+
+# path_user_passwd=$(cut -d: -f1,6 /etc/passwd)
+
+# #Boucle for car on sait qu'on va faire une condition en fonction du nombre d'utilisateur
+
+# for user in $folder_user
+# do
+#     name_user=$( cut -d: -f1 $path_user_passwd)
+#     folder_user=$( cut -d: -f2 $path_user_passwd)
+#     calcul_folder=$(du -hs $folder_user)
+#     echo "$name_user"
+#     echo "$folder_user"
+#     echo "$calcul_folder"
+#     echo "#############"
+# done
+
+for user in $(grep -E "^[a-z_][a-z0-9_-]*:x:" /etc/passwd)
+do
+
+ 
+
+
+        son_home=$(echo $user | cut -d: -f6)
+        du -sh $son_home 2>/dev/null >> fichier_du4
+
+ 
+
+ 
+
+ 
+
+done

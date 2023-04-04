@@ -1,0 +1,15 @@
+#!/bin/bash
+
+nb_temp=$(($RANDOM % 100))
+
+echo $nb_temp
+
+while [[ $(($nb_temp % 2)) -ne 0 ]]
+do
+    echo $nb_temp
+    echo "Votre nombre est impair"
+    nb_temp=$(($RANDOM % 100))
+done
+
+echo $nb_temp
+echo "votre nombre est pair"

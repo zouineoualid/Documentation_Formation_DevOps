@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#Ce script permet de créer des fichier scipt bash à la volée  
+#Il doit obligatoirement se trouver dans le dossier dans lequel vous voulez créer le script pour fonctionner
+#V.1 - Boucle while avec input, vérification de l'existence du fichier et rajout du droit d'exécution  
+
+
+tempo_var="yes"
+
+while [[ $tempo_var != quit ]]
+do
+    read -p "Ecrivez le nom du fichier à créer ? : " file_script
+    if [[ -e $file_script ]]; then
+        read -p "Le fichier existe déjà, vous ne pouvez pas le créer !"
+    else
+        touch $file_script && chmod +x $file_script
+    fi
+    read -p "Voulez-vous créer un autre fichier (pour quitter : quit) : " tempo_var
+done
+
+
+

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#Variable servant au pile ou face
+
+pile=0
+face=1
+
+#Variable des joueurs à incrémenter
+
+player_1=0
+computer=0
+
+#Variable des manches pour la boucle for
+
+read -p "En combien de manche va se jouer la partie ? : " nb_manche
+
+#######DEBUT_PROGRAMME##############
+
+for manche in $(seq  1 $nb_manche)
+do
+    result_pile_face=$(($RANDOM % 2))
+    read -p "l'ordinateur vient de lancer la pièce : pile ou face (0 = pile | face = 1)? : " pari
+    if [[ $pari -eq $result_pile_face ]]; then
+        player_1=$(($player_1+1))
+    else
+        computer=$(($computer+1))
+    fi   
+done
+
+echo "La partie est terminée : voici le résultat"
+    echo "player_1 : " $player_1
+    echo "computer : " $computer

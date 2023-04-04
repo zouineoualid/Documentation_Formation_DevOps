@@ -1,0 +1,51 @@
+################### xmakey.sh ##################
+
+
+## suite de makey.sh
+
+rajouter l'argument '--crypt' au programme makey.sh
+
+cette option permet a makey.sh de chiffrer la clee avec cryptsetup.
+puis de creer les partitions LVM sur le conteneur chiffre
+
+chaque conteneur chiffre aura un mot de passe aleatoire qui se trouvera dans le fichier:
+/var/makey/$SERIALdevice
+
+on s'en sert pour creer le conteneur et ouvrir le device chiffre
+on fera la suite des procedures (LVM) sur ce conteneur ouvert
+
+
+quand on nettoie le device (quand on relance le programme) il faut soit:
+-utiliser la meme clee de chiffrement et donc ne pas re-chiffre le device
+-refaire une clee de chiffrement (mieux?)
+
+on ferme le conteneur chiffre apres avoir montre les partitions LVM a l'user
+
+
+
+
+
+
+
+
+
+
+## xmakey
+Sauvegarde d'un(ou des) fichier archive et compresse sur une clee chiffree et partionnee LVM
+
+le programme prend 2 arguments:
+device=     -> qui determine le device a utiliser pour la copie de notre achive 
+files=      -> qui determine les fichiers a archiver et compresse pour les placer sur le device
+
+pour le files=
+l'utilisateur peut rentrer un chemin absolu,relatif, et commencant par ~
+pour l'exercice '~' represente le home directory de l'utilisateur qui a utilise sudo
+donc ~ ne sera pas egal a "/root" mais a "/home/user/"
+
+
+l'user tape:$> sudo bash xmaKey.sh device=/dev/sde files=Downloads/film.mp4,~/Downloads/img.png,/home/user2/file.txt
+
+On cree une clee chiffree avec une seule partition (/dev/sde1) (maKey.sh)
+
+on cree une archive compressee des fichiers Downloads/film.mp4,~/Downloads/img.png,/home/user2/file.txt
+et on place l'archive dans la partition lvm chiffree

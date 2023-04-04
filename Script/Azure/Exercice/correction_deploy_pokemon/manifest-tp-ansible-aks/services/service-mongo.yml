@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: spoon-mongo-service
+  name: spoon-mongo-service
+spec:
+  # le type peut être nodePort avec l'adresse du node
+  ports:
+    - name: "mongo-service"
+      port: 27017
+      targetPort: 27017
+  selector:
+    app: spoon-mongo

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: spoon-rabbitmq
+  name: spoon-rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spoon-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: spoon-rabbitmq
+        customer-db: db
+    spec:
+      containers:
+        - image: rabbitmq:3-management-alpine
+          name: spoon-rabbitmq
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5672
+              name: spoon-rabbitmq
+          # livenessProbe:
+          #   httpGet:
+          #     path: /check
+          #     port: 3000
+          #   initialDelaySeconds: 2
+          #   periodSeconds: 3

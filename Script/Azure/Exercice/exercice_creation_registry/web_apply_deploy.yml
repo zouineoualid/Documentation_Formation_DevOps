@@ -1,0 +1,67 @@
+#Ce fichier de déploiement a été réalisé avec un projet de développement déjà finalisé
+
+apiVersion: 2019-12-01
+location: japaneast
+type: Microsoft.ContainerInstance/ContainerGroups
+properties:
+  containers:
+  - name: tp-benoit-vote-result
+    properties:
+      image: benoitreactregistry.azurecr.io/tp-benoit-vote-result:v1
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+      ports:
+      - port: 4000
+  - name: tp-benoit-vote
+    properties:
+      image: benoitreactregistry.azurecr.io/tp-benoit-vote:v1
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+      ports:
+      - port: 80
+  - name: tp-benoit-worker
+    properties:
+      image: benoitreactregistry.azurecr.io/tp-benoit-worker:v1
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+      ports:
+      - port: 8081
+  - name: tp-benoit-postgres
+    properties:
+      image: postgres
+      environmentVariables:
+        - name: 'POSTGRES_USER'
+          value: 'postgres'
+        - name: 'POSTGRES_PASSWORD'
+          value: 'postgres'
+      resources:
+        requests:
+          cpu: 2
+          memoryInGb: 2
+      ports:
+      - port: 5432
+  - name: tp-benoit-redis
+    properties:
+      image: redis
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+      ports:
+      - port: 6379
+  osType: linux
+  ipAddress:
+    type: public
+    ports:
+      - protocol: tcp
+        port: 80
+  imageRegistryCredentials:
+  - server: benoitreactregistry.azurecr.io
+    username: benoitReactRegistry
+    password: g5yXANwNFQJAH6BREPRohaCfIy1pd6CMBmK+K5u0nL+ACRC3xr9O

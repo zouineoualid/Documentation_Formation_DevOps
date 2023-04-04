@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: spoon-goapp
+    customer-db: db-mongo
+    customer: rabbit-mq
+  name: spoon-goapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spoon-goapp
+  template:
+    metadata:
+      labels:
+        app: spoon-goapp
+        customer-db: db-mongo
+    spec:
+      containers:
+        - image: m2iformationihab.azurecr.io/goapp
+          command: [sh -c "./wait-for.sh spoon-rabbitmq-service.default.svc.local:5672 && go run main.go"]
+          name: goapp
+          # volumeMounts:
+          #   - mountPath: ./goapp:/go/src/goapp
+          #     name: test3-volume
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: spoon-goapp
+          env:
+            - name: RABBITMQ_URL
+              value: amqp://guest:guest@spoon-rabbitmq-service.default.svc.local/
+            - name: MONGODB_URI
+              value: mongodb://spoon-mongo-service.default.svc.local:27017/spoon 
+            - name: POKEMON_ROUTING_KEY
+              value: pokemon
+          # livenessProbe:
+          #   httpGet:
+          #     path: /check
+          #     port: 3000
+          #   initialDelaySeconds: 2
+          #   periodSeconds: 3
+      # volumes:
+      #   - name: test3-volume

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: spoon-goapp-service
+  name: spoon-goapp-service
+spec:
+  # le type peut être nodePort avec l'adresse du node
+  
+  ports:
+    - name: "fastapp-service"
+      port: 80
+      targetPort: 80
+  selector:
+    app: spoon-goapp

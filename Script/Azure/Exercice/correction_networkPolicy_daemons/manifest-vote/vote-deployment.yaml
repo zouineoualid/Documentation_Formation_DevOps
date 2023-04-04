@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: vote
+  name: vote
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vote
+  template:
+    metadata:
+      labels:
+        app: vote
+        customer: redis
+    spec:
+      containers:
+        - image: m2iformationihab.azurecr.io/vote-image
+          name: vote
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: vote
+          livenessProbe:
+            httpGet:
+              path: /check
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          

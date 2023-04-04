@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: spoon-glimmer
+    customer-G: glimmer
+  name: spoon-glimmer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spoon-glimmer
+  template:
+    metadata:
+      labels:
+        app: spoon-glimmer
+        customer-db: db
+    spec:
+      containers:
+        - image: m2iformationihab.azurecr.io/glimmer
+          command: ["sh"]
+          args: ["-c", "yarn --dev && yarn dev"]
+          name: spoon-glimmer
+          env:
+            - name: API_URL
+              value: spoon-goapp-service.default.svc.local
+            
+          # volumeMounts:
+          #   - mountPath: ./glimmer:/usr/app
+          #     name: test1-volume
+          #   - mountPath: ./glimmer/node_modules:/usr/app/node_modules
+          #     name: test2-volume
+            
+          # env:
+          #   - name: RABBITMQ_URL
+          #     value: amqp://guest:guest@spoon-rabbitmq/
+          #   - name: MONGODB_URI
+          #     value: mongodb://spoon-mongo:27017/spoon 
+          #   - name: POKEMON_ROUTING_KEY
+          #     value: pokemon
+
+
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: glimmer
+
+      # volumes:
+      # - name: test1-volume
+      # - name: test2-volume
+          # livenessProbe:
+          #   httpGet:
+          #     path: /check
+          #     port: 3000
+          #   initialDelaySeconds: 2
+          #   periodSeconds: 3

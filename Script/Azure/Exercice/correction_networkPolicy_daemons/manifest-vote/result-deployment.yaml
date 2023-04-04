@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: result
+  name: result
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+        customer-db: db
+    spec:
+      containers:
+        - image: m2iformationihab.azurecr.io/result-image
+          name: result
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4000
+              name: result
+          livenessProbe:
+            httpGet:
+              path: /check
+              port: 4000
+            initialDelaySeconds: 2
+            periodSeconds: 3
